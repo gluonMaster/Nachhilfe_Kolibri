@@ -285,7 +285,7 @@ ErrorHandler:
     ClearAllFilters = False
 End Function
 
-Sub ApplyDateBasedFormatting(ws As Worksheet)
+Public Sub ApplyDateBasedFormatting(ws As Worksheet)
     ' This procedure clears existing conditional formatting and applies new formatting
     ' based on date ranges and weekday criteria
     '
@@ -297,8 +297,8 @@ Sub ApplyDateBasedFormatting(ws As Worksheet)
     Dim i As Long, j As Long
     Dim cellRange As Range
     Dim columnDate As Date
-    Dim allowedStartDate As Date
-    Dim allowedEndDate As Date
+    Dim allowedStartDate, allowedStartDate0 As Date
+    Dim allowedEndDate, allowedEndDate0 As Date
     
     Application.EnableEvents = False
     
@@ -325,6 +325,8 @@ Sub ApplyDateBasedFormatting(ws As Worksheet)
         On Error Resume Next
         allowedStartDate = ws.Cells(i, "F").value
         allowedEndDate = ws.Cells(i, "G").value
+        allowedStartDate0 = ws.Cells(i, "AW").value
+        allowedEndDate0 = ws.Cells(i, "AX").value
         On Error GoTo 0
         
         ' Skip row if date range is invalid
@@ -349,6 +351,8 @@ Sub ApplyDateBasedFormatting(ws As Worksheet)
                     cellRange.Interior.Color = RGB(253, 253, 142)  ' Yellow
                 ElseIf columnDate >= allowedStartDate And columnDate <= allowedEndDate Then
                     cellRange.Interior.Color = RGB(144, 238, 144)  ' Light green
+                ElseIf columnDate >= allowedStartDate0 And columnDate <= allowedEndDate0 Then
+                    cellRange.Interior.Color = RGB(60, 179, 113)  ' Light green
                 Else
                     cellRange.Interior.ColorIndex = xlNone  ' No color
                 End If
@@ -358,7 +362,7 @@ Sub ApplyDateBasedFormatting(ws As Worksheet)
 NextRow:
     Next i
     
-    MsgBox "Formatting applied successfully", vbInformation
+    'MsgBox "Formatting applied successfully", vbInformation
     
 CleanExit:
     ' Restore settings

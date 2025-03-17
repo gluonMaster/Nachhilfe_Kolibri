@@ -191,6 +191,9 @@ Sub TransferDataFromForm()
             formSheet.Range(rangesToClear(i)).ClearContents
             formSheet.Range(rangesToClear(i)).Interior.ColorIndex = xlNone
         Next i
+
+        'Apply formats to the loadtable with respect to the new data
+        Call ApplyDateBasedFormatting(targetSheet)
         
         ' Activate the target sheet
         targetSheet.Activate

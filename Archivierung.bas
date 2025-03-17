@@ -160,7 +160,7 @@ Sub ArchiveAndCleanKinder_Optimized_Fixed()
             Set startDateCell = wsKinder.Cells(i, "G")
             Set endDateCell = wsKinder.Cells(i, "H")
             
-            If wsKinder.Cells(i, "A").Font.ColorIndex = 15 Then ' This was an inactive record
+            If wsKinder.Cells(i, "A").Font.ColorIndex = 16 Then ' This was an inactive record
                 wasInactive = True
                 
                 ' Check if the date range is now active
@@ -304,7 +304,7 @@ Sub ArchiveAndCleanKinder_Optimized_Fixed()
         
         ' Set gray font color for inactive records
         If inactiveCount > 0 Then
-            wsKinder.Range("A" & 5 + activeCount & ":V" & 4 + totalRecords).Font.ColorIndex = 15 ' Gray color
+            wsKinder.Range("A" & 5 + activeCount & ":V" & 4 + totalRecords).Font.ColorIndex = 16 ' Gray color
             
             ' Ask user if they want to delete inactive records
             response = MsgBox("There are " & inactiveCount & " inactive records. Would you like to delete them?", _
