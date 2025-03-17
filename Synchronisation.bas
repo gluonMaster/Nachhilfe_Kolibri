@@ -250,8 +250,8 @@ Sub SynchronizeFromCopies()
                         ' Copy AU and AV
                         originalWs.Cells(existingRow, "AU").value = copyWs.Cells(i, "AU").value
                         originalWs.Cells(existingRow, "AV").value = copyWs.Cells(i, "AV").value
-                        ' Set AW to the employee name
-                        originalWs.Cells(existingRow, "AW").value = employeeName
+                        ' Set AY to the employee name
+                        originalWs.Cells(existingRow, "AY").value = employeeName
                         ' Update fullKey in dictFullRecords
                         ' First delete the old fullKey associated with the existing row
                         Dim dictKeyItem As Variant
@@ -288,8 +288,8 @@ Sub SynchronizeFromCopies()
                             ' Copy AU and AV
                             originalWs.Cells(lastRowOriginal, "AU").value = copyWs.Cells(i, "AU").value
                             originalWs.Cells(lastRowOriginal, "AV").value = copyWs.Cells(i, "AV").value
-                            ' Set AW to the employee name
-                            originalWs.Cells(lastRowOriginal, "AW").value = employeeName
+                            ' Set AY to the employee name
+                            originalWs.Cells(lastRowOriginal, "AY").value = employeeName
                             ' Add new fullKey to dictFullRecords
                             dictFullRecords.Add fullKey, lastRowOriginal
                         Else
@@ -308,8 +308,8 @@ Sub SynchronizeFromCopies()
                     ' Copy AU and AV
                     originalWs.Cells(lastRowOriginal, "AU").value = copyWs.Cells(i, "AU").value
                     originalWs.Cells(lastRowOriginal, "AV").value = copyWs.Cells(i, "AV").value
-                    ' Set AW to the employee name
-                    originalWs.Cells(lastRowOriginal, "AW").value = employeeName
+                    ' Set AY to the employee name
+                    originalWs.Cells(lastRowOriginal, "AY").value = employeeName
                     ' Add keys to dictionaries
                     dictKeys.Add key, lastRowOriginal
                     dictFullRecords.Add fullKey, lastRowOriginal
@@ -343,7 +343,7 @@ NextRecord:
     ' Step 6: Sort the original workbook's sheet based on column B in ascending order
     lastRowOriginal = originalWs.Cells(originalWs.Rows.Count, "A").End(xlUp).row
     If lastRowOriginal >= 11 Then
-        originalWs.Range("A11:AW" & lastRowOriginal).Sort _
+        originalWs.Range("A11:AY" & lastRowOriginal).Sort _
             Key1:=originalWs.Range("B11"), Order1:=xlAscending, _
             Key2:=originalWs.Range("C11"), Order1:=xlAscending, _
             Header:=xlNo

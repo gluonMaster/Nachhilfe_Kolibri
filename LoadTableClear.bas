@@ -31,7 +31,7 @@ Sub ClearEducationalLoadTable()
     ' **3. Define the ranges to clear**
     If lastRow >= 11 Then
         Set clearRange1 = targetWs.Range("A11:AN" & lastRow)
-        Set clearRange2 = targetWs.Range("AU11:AW" & lastRow)
+        Set clearRange2 = targetWs.Range("AU11:AY" & lastRow)
         Set backgroundRange = targetWs.Range("I11:AN" & lastRow)
     Else
         ' If there are no data rows beyond row 10, exit the macro
