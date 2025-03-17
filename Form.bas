@@ -97,16 +97,10 @@ Sub TransferDataFromForm()
     On Error GoTo 0
     
     If formSheet.Range("C9") = "" Then
-        MsgBox "You did not specify the type of the lesson. Data transfer has not been performed!", vbInformation
+        MsgBox "You did not specify the type of lesson. Data transfer has not been performed!", vbInformation
         Exit Sub
     End If
-    
-    ' Check if Form sheet exists
-    If formSheet Is Nothing Then
-        MsgBox "Sheet 'Form' not found!", vbExclamation
-        Exit Sub
-    End If
-    
+      
     ' Get target row number from cell A1
     On Error Resume Next
     targetRow = CLng(formSheet.Range("A1").value)
@@ -164,11 +158,26 @@ Sub TransferDataFromForm()
     '        Next j
         Next i
         
+        'Relocate the dates of lerning period boundaries from Form to the target table
+        targetSheet.Range("F" & targetRow).Value = formSheet.Range("B9").Value
+        targetSheet.Range("F" & targetRow).NumberFormat = "dd.mm.yyyy"
+        targetSheet.Range("G" & targetRow).Value = formSheet.Range("B10").Value
+        targetSheet.Range("G" & targetRow).NumberFormat = "dd.mm.yyyy"
+
+        ' Adding a flag for two periods in the permission falling within the same reporting month
+        If formSheet.Range("B7").Value<>"" And formSheet.Range("B8").Value<>"" Then
+            targetSheet.Range("I" & targetRow).Value = 2
+            targetSheet.Range("AW" & targetRow).Value = formSheet.Range("B7").Value
+            targetSheet.Range("AW" & targetRow).NumberFormat = "dd.mm.yyyy"
+            targetSheet.Range("AX" & targetRow).Value = formSheet.Range("B8").Value
+            targetSheet.Range("AX" & targetRow).NumberFormat = "dd.mm.yyyy"
+        End If
+
         ' Clear the Form sheet
         
         ' Clear specific cells
         Dim cellsToClear As Variant
-        cellsToClear = Array("A1", "C1", "A5", "B5", "C5", "C7", "C9", "B9", "B10")
+        cellsToClear = Array("A1", "C1", "A5", "B5", "C5", "C7", "C9", "B7", "B8", "B9", "B10")
         
         For i = 0 To UBound(cellsToClear)
             formSheet.Range(cellsToClear(i)).ClearContents
