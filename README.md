@@ -1,49 +1,71 @@
-# Tutoring administration with Excel VBA
+# Nachhilfe Kolibri
 
-Excel VBA modules developed for tutoring administration at Kolibri. The code supports the practical workflow around student records, monthly teaching hours, staff workbook copies, and reports used for billing.
+Excel VBA source code for tutoring administration: validating teaching hours,
+maintaining student records, preparing monthly worksheets, producing reports,
+and generating attendance forms for Jobcenter and Sozialamt workflows.
 
-This repository contains exported VBA source modules and a progress form. It is a source-code reference for a workbook-based application: the operational workbook, its templates, and student records are not included.
+This repository is a **source snapshot for an existing workbook system**.
+Production workbooks, personal records, document templates, and generated reports
+are not included. A clean clone is useful for reviewing the implementation; it
+does not provide a ready-to-run Excel application.
 
-## Main workflows
+## What the code covers
 
-- Import and reconcile student identifiers and address information from an external workbook.
-- Populate monthly worksheets and validate recorded teaching hours.
-- Detect duplicate records and maintain an archive.
-- Create workbook copies for staff and synchronize their updates.
-- Generate individual reports from workbook templates.
+- Teaching-hour checks, including weeks that span two months.
+- Monthly worksheet preparation and reports covering multiple approval periods.
+- Separate working records for form preparation, with synchronization between
+  `Kinder` and `Kinder_Blanks`, duplicate handling, and identifier formatting.
+- Synchronization with an administrative workbook and transfer of monthly values.
+- Editable Word attendance forms for Jobcenter and legacy Excel forms for
+  Sozialamt, with validation of benefit reference numbers.
+- Worksheet event handlers and the progress form required by the reporting code.
 
-## Code map
+The workflows reflect a particular workbook layout and German administrative
+processes. Sheet names, column mappings, and some workbook names remain
+integration-specific; they must be reviewed when adapting the code.
 
-| Area | Modules |
+## Repository layout
+
+| Path | Contents |
 | --- | --- |
-| Student imports and identifiers | [ImportKinder.bas](ImportKinder.bas), [CorrectKinderIdentifiers.bas](CorrectKinderIdentifiers.bas), [CheckExistingNummer.bas](CheckExistingNummer.bas) |
-| Address and name processing | [AdressImport.bas](AdressImport.bas), [SplitAddress.bas](SplitAddress.bas), [SurenameNameSplitting.bas](SurenameNameSplitting.bas) |
-| Monthly worksheets and hours | [MonatTabelleEinfullung.bas](MonatTabelleEinfullung.bas), [ValidateStudyHours.bas](ValidateStudyHours.bas), [KorrekturStudyload.bas](KorrekturStudyload.bas) |
-| Staff copies and synchronization | [ExemplareMachen.bas](ExemplareMachen.bas), [Synchronisation.bas](Synchronisation.bas) |
-| Reports and progress display | [Berichten.bas](Berichten.bas), [frmProgress.frm](frmProgress.frm), [frmProgress.frx](frmProgress.frx) |
-| Data review and archiving | [Analyzierung.bas](Analyzierung.bas), [RemoveDuplicates.bas](RemoveDuplicates.bas), [Archivierung.bas](Archivierung.bas) |
-| Workbook forms and maintenance | [Form.bas](Form.bas), [LoadTableClear.bas](LoadTableClear.bas), [VBA_Export_All.bas](VBA_Export_All.bas) |
+| [vba/modules/](vba/modules/) | 52 standard VBA modules |
+| [vba/classes/](vba/classes/) | Four VBA class modules |
+| [vba/forms/](vba/forms/) | `frmProgress.frm` and its companion `.frx` resource |
+| [vba/worksheets/](vba/worksheets/) | Event code for `Kinder` and `Kinder_Blanks` |
+| [docs/INTEGRATION.md](docs/INTEGRATION.md) | Component installation, workbook contracts, and focused checks |
+| [docs/SOURCE_STATUS.md](docs/SOURCE_STATUS.md) | Source selection and verification limits |
 
 ## Requirements and integration
 
-The intended environment is desktop Microsoft Excel on Windows with VBA support. The code uses Excel's object model, file dialogs, and Windows scripting objects; it is not an Excel Online add-in or a standalone executable.
+The target environment is desktop Microsoft Excel on Windows with VBA enabled.
+DOCX generation additionally uses desktop Microsoft Word. COM dependencies use
+late binding, including `Scripting.Dictionary`, `Scripting.FileSystemObject`,
+`VBScript.RegExp`, `ADODB.Stream`, and `WScript.Shell`.
 
-To inspect or adapt the modules:
+Integration requires a compatible workbook and suitable local templates. Review
+the [integration guide](docs/INTEGRATION.md) before importing anything. In
+particular, the UTF-8 source files need encoding-aware handling in the VBA editor,
+and worksheet event code must be placed in the corresponding worksheet modules.
 
-1. Work in a separate macro-enabled test workbook (`.xlsm`) with synthetic records.
-2. Open the VBA editor with **Alt+F11** and import the required `.bas` modules using **File > Import File**.
-3. If a workflow uses the progress form, keep `frmProgress.frm` and `frmProgress.frx` together and import the `.frm` file.
-4. Read the selected procedure and prepare its required sheets, columns, and templates before running it.
-5. Compile the VBA project and exercise the selected workflow on the test workbook before adapting it to another workbook.
+Use a disposable workbook with synthetic records for adaptation and validation.
+The repository does not include a complete demonstration workbook or an automated
+Office test environment.
 
-The original workbook layout is part of the application contract. Examples include sheets named `Kinder`, `Kinder_pre`, `Archiv`, `Form`, `Shablon`, and `Shablon2`, and an external `Kartei` sheet. Several routines act on `ActiveSheet` or use fixed row and column positions. Creating empty sheets with these names alone is not sufficient to reproduce the complete application.
+## Current status
 
-`VBA_Export_All.bas` exports source components and uses Excel's VBA project object model. It is a maintenance utility, not a required step for normal data processing.
+The source set has been compared offline with the reference workbook. It includes
+worksheet code and a progress-form dependency that were missing from the exported
+module folder alone.
 
-## Scope and limitations
+One source change is ahead of the reference workbook: non-Jobcenter records now
+produce only the legacy XLSX form by default, and the record-processing routine
+starts Word only when it needs DOCX output. This change is implemented in the
+source and documented, but has not been verified by running the updated workbook.
+It does not establish that every application entry point can run without Word.
 
-- The public snapshot is a collection of workflow-specific modules, not a general-purpose tutoring management package.
-- A standalone demo workbook and automated test harness are not included.
-- Some procedures update, clear, or archive worksheet data. Review their target sheets and use a disposable test copy when adapting them.
-- Personal records, operational workbooks, generated reports, and billing documents belong outside the source repository.
-- Existing module names are retained to preserve the mapping to the exported VBA project.
+Existing self-checks cover reference-number normalization and synthetic form
+generation. They have not been executed as part of this publication preparation.
+See [source status](docs/SOURCE_STATUS.md) for the remaining limits, including the
+unverified binary design of the progress form.
+
+No license has been assigned to this repository.

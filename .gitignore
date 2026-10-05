@@ -1,4 +1,4 @@
-# Operational workbooks, records, and generated documents
+# Operational records and Office files stay outside the source repository.
 *.xls
 *.xlsx
 *.xlsm
@@ -8,13 +8,21 @@
 *.mdb
 *.accdb
 *.csv
+*.tsv
 *.pdf
 *.doc
 *.docx
 *.log
+*.zip
+*.bak
 ~$*
-
-# Machine-local settings
 .env
 .env.*
 !.env.example
+data/
+outputs/
+backups/
+tmp/
+__pycache__/
+.venv/
+# Keep VBA form resources (.frx): these are source assets, not workbooks.
