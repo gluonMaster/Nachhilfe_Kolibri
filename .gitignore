@@ -1,0 +1,20 @@
+# Operational workbooks, records, and generated documents
+*.xls
+*.xlsx
+*.xlsm
+*.xlsb
+*.xltx
+*.xltm
+*.mdb
+*.accdb
+*.csv
+*.pdf
+*.doc
+*.docx
+*.log
+~$*
+
+# Machine-local settings
+.env
+.env.*
+!.env.example
