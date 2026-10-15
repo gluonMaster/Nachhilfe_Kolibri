@@ -255,7 +255,7 @@ Private Sub SyncKinderWithAdmin(ByVal wsKinder As Worksheet, _
         If TryParseKarteiDate(adminDateRaw, parsedDate) Then
             If Not CellDateEquals(wsKinder.Range(COL_H & rowNum).value, parsedDate) Then
                 wsKinder.Range(COL_H & rowNum).value = parsedDate
-                wsKinder.Range(COL_H & rowNum).NumberFormat = "dd.mm.yyyy"
+                wsKinder.Range(COL_H & rowNum).numberFormat = "dd.mm.yyyy"
                 stats.DateUpdated = stats.DateUpdated + 1
             End If
         Else
@@ -374,7 +374,7 @@ Private Sub SyncKinderToBlanksStable(ByVal wsKinder As Worksheet, ByRef stats As
     NHblank_ApplyAllFormats wsBlanks, BLANKS_FIRST_DATA_ROW
 
     wsBlanks.Range("T2").value = wsKinder.Range("T2").value
-    wsBlanks.Range("T2").NumberFormat = "dd.mm.yyyy"
+    wsBlanks.Range("T2").numberFormat = "dd.mm.yyyy"
 
     Set dictKinder = CreateObject("Scripting.Dictionary")
     Set dictBlanks = CreateObject("Scripting.Dictionary")
@@ -500,8 +500,8 @@ Private Function UpdateBlanksRow(ByVal wsKinder As Worksheet, _
     If SetCellIfDifferent(wsBlanks.Range(COL_S & blanksRow), wsKinder.Range(COL_S & kinderRow).value) Then changed = True
     If SetCellIfDifferent(wsBlanks.Range(COL_T & blanksRow), wsKinder.Range(COL_T & kinderRow).value) Then changed = True
 
-    wsBlanks.Range(COL_G & blanksRow).NumberFormat = "dd.mm.yyyy"
-    wsBlanks.Range(COL_H & blanksRow).NumberFormat = "dd.mm.yyyy"
+    wsBlanks.Range(COL_G & blanksRow).numberFormat = "dd.mm.yyyy"
+    wsBlanks.Range(COL_H & blanksRow).numberFormat = "dd.mm.yyyy"
 
     UpdateBlanksRow = changed
 End Function
@@ -523,8 +523,8 @@ Private Sub AddRecordToBlanksStable(ByVal wsKinder As Worksheet, _
         End If
     Next colNum
 
-    wsBlanks.Range(COL_G & newRow).NumberFormat = "dd.mm.yyyy"
-    wsBlanks.Range(COL_H & newRow).NumberFormat = "dd.mm.yyyy"
+    wsBlanks.Range(COL_G & newRow).numberFormat = "dd.mm.yyyy"
+    wsBlanks.Range(COL_H & newRow).numberFormat = "dd.mm.yyyy"
 End Sub
 
 ' =============================================================================
@@ -570,7 +570,7 @@ Private Function TryParseKarteiDate(ByVal rawValue As Variant, ByRef outDate As 
     With regex
         .Global = False
         .ignoreCase = True
-        .Pattern = "(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})"
+        .pattern = "(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})"
     End With
 
     If Not regex.Test(textValue) Then Exit Function

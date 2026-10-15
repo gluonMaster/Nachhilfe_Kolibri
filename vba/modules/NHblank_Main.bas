@@ -103,7 +103,7 @@ Public Sub GenerateBlanks()
         wordTemplatePath = fso.BuildPath(workbookLocalPath, "Shablon.docx")
         legacyTemplatePath = fso.BuildPath(workbookLocalPath, "Shablon.xlsx")
 
-        If Not fso.FileExists(wordTemplatePath) Then
+        If Not fso.fileExists(wordTemplatePath) Then
             MsgBox "Datei Shablon.docx wurde im Verzeichnis nicht gefunden: " & _
                    workbookLocalPath & vbCrLf & _
                    "Bitte waehlen Sie die Datei manuell aus.", vbExclamation
@@ -112,7 +112,7 @@ Public Sub GenerateBlanks()
             If wordTemplatePath = "" Then GoTo CleanExit
         End If
 
-        If Not fso.FileExists(legacyTemplatePath) Then
+        If Not fso.fileExists(legacyTemplatePath) Then
             MsgBox "Datei Shablon.xlsx wurde im Verzeichnis nicht gefunden: " & _
                    workbookLocalPath & vbCrLf & _
                    "Bitte waehlen Sie die Datei manuell aus.", vbExclamation

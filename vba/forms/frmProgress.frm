@@ -4,9 +4,9 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmProgress
    ClientHeight    =   2376
    ClientLeft      =   108
    ClientTop       =   456
-   ClientWidth     =   9732
+   ClientWidth     =   9732.001
    OleObjectBlob   =   "frmProgress.frx":0000
-   StartUpPosition =   1  'Fenstermitte
+   StartUpPosition =   1  'CenterOwner
 End
 Attribute VB_Name = "frmProgress"
 Attribute VB_GlobalNameSpace = False

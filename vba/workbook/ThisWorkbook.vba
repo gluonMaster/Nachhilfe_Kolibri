@@ -1,0 +1,1 @@
+Public IsMacroRunning As Boolean

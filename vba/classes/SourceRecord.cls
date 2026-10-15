@@ -14,7 +14,7 @@ Option Explicit
 ' Description: Holds source record data
 ' ====================================================================
 
-Public RowNumber As Long
+Public rowNumber As Long
 Public ID As String
 Public lastName As String
 Public firstName As String

@@ -23,6 +23,8 @@ data/
 outputs/
 backups/
 tmp/
+# Local working material: notes, prompts, older workbooks and form sources.
+local/
 __pycache__/
 .venv/
 # Keep VBA form resources (.frx): these are source assets, not workbooks.

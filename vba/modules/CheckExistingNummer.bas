@@ -45,7 +45,7 @@ Public Sub CheckAndFixExistingNumbers()
                 correctedValue = CorrectFormat(originalValue)
                 If correctedValue <> "" Then
                     ' If corrected successfully
-                    cell.NumberFormat = "@"
+                    cell.numberFormat = "@"
                     cell.value = correctedValue
                 Else
                     ' If cannot correct, highlight the cell
@@ -54,7 +54,7 @@ Public Sub CheckAndFixExistingNumbers()
                 End If
             Else
                 ' If format is valid but we still ensure the cell is text format
-                cell.NumberFormat = "@"
+                cell.numberFormat = "@"
                 cell.value = originalValue
             End If
         End If
@@ -76,7 +76,7 @@ Private Function IsValidFormat(ByVal textVal As String) As Boolean
     Set regex = CreateObject("VBScript.RegExp")
     
     With regex
-        .Pattern = "^\d\.\s\d{4}$"
+        .pattern = "^\d\.\s\d{4}$"
         .ignoreCase = True
         .Global = False
     End With

@@ -32,7 +32,7 @@ Public Sub SplitAddressIntoStreetAndCity()
     
     ' Create a RegExp object to find a 5-digit postal code
     Set regex = CreateObject("VBScript.RegExp")
-    regex.Pattern = "\b\d{5}\b"
+    regex.pattern = "\b\d{5}\b"
     regex.Global = False
     regex.ignoreCase = True
     
@@ -46,7 +46,7 @@ Public Sub SplitAddressIntoStreetAndCity()
                 ' Extract the postal code and split the address
                 postalCode = match.value
                 ' match.FirstIndex is zero-based, Mid function is 1-based
-                codePosition = match.FirstIndex + 1
+                codePosition = match.firstIndex + 1
                 
                 leftPart = Left(addressValue, codePosition - 1)
                 ' Add the length of postalCode and start from next character

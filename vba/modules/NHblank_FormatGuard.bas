@@ -25,7 +25,7 @@ Public Sub NHblank_EnsureBgNummerTextFormat(ByVal ws As Worksheet, ByVal firstDa
     If ws Is Nothing Then Exit Sub
     
     ' Set text format for entire column O to prevent auto-conversion
-    ws.Columns(COL_O).NumberFormat = "@"
+    ws.Columns(COL_O).numberFormat = "@"
 End Sub
 
 ' -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ Public Sub NHblank_WriteBgNummer(ByVal targetCell As Range, ByVal bgValue As Var
     If targetCell Is Nothing Then Exit Sub
     
     ' Set text format first
-    targetCell.NumberFormat = "@"
+    targetCell.numberFormat = "@"
     
     ' Write using safe string conversion
     targetCell.Value2 = NHblank_BgNummerToString(bgValue)
@@ -98,11 +98,11 @@ Public Sub NHblank_EnsureDateDisplayFormat(ByVal ws As Worksheet, ByVal firstDat
     If ws Is Nothing Then Exit Sub
     
     ' Format entire columns G and H for date display
-    ws.Columns(COL_G).NumberFormat = "dd.mm.yyyy"
-    ws.Columns(COL_H).NumberFormat = "dd.mm.yyyy"
+    ws.Columns(COL_G).numberFormat = "dd.mm.yyyy"
+    ws.Columns(COL_H).numberFormat = "dd.mm.yyyy"
     
     ' Format reference date cell T2 (always row 2)
-    ws.Cells(2, COL_T).NumberFormat = "dd.mm.yyyy"
+    ws.Cells(2, COL_T).numberFormat = "dd.mm.yyyy"
 End Sub
 
 ' -----------------------------------------------------------------------------

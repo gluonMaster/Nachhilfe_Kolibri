@@ -49,7 +49,7 @@ Public Function ProcessRecords( _
     End If
 
     If processAllRecords Then
-        lastRow = wsKinder.Cells(wsKinder.Rows.Count, "C").End(xlUp).Row
+        lastRow = wsKinder.Cells(wsKinder.rows.Count, "C").End(xlUp).row
 
         For currentRow = 5 To lastRow
             If IsRecordActive(wsKinder, currentRow) Then
@@ -134,11 +134,11 @@ Public Sub CheckCurrentCellColor()
     End If
     On Error GoTo 0
 
-    msg = "Color Debug for cell " & cell.Address & ":" & vbCrLf & vbCrLf
+    msg = "Color Debug for cell " & cell.address & ":" & vbCrLf & vbCrLf
     msg = msg & "Font.ColorIndex: " & cell.Font.ColorIndex & vbCrLf
     msg = msg & "Font.Color: " & cell.Font.Color & vbCrLf
     msg = msg & "Font.ThemeColor: " & themeColorStr & vbCrLf
-    msg = msg & "Cell Value: " & cell.Value & vbCrLf
+    msg = msg & "Cell Value: " & cell.value & vbCrLf
 
     MsgBox msg, vbInformation, "Cell Color Info"
 End Sub
@@ -149,7 +149,7 @@ Private Function IsRecordActive(ByVal ws As Worksheet, _
 
     Set cell = ws.Cells(rowNum, "C")
 
-    If Len(Trim$(CStr(cell.Value))) = 0 Then Exit Function
+    If Len(Trim$(CStr(cell.value))) = 0 Then Exit Function
     IsRecordActive = (cell.Font.ColorIndex <> 15)
 End Function
 
@@ -195,16 +195,16 @@ Private Function ProcessSingleRecord( _
     On Error GoTo ErrorHandler
     Set fso = CreateObject("Scripting.FileSystemObject")
 
-    lastName = Trim$(CStr(wsKinder.Cells(rowNum, "C").Value))
-    firstName = Trim$(CStr(wsKinder.Cells(rowNum, "D").Value))
-    discipline = Trim$(CStr(wsKinder.Cells(rowNum, "E").Value))
-    teacherName = Trim$(CStr(wsKinder.Cells(rowNum, "I").Value))
+    lastName = Trim$(CStr(wsKinder.Cells(rowNum, "C").value))
+    firstName = Trim$(CStr(wsKinder.Cells(rowNum, "D").value))
+    discipline = Trim$(CStr(wsKinder.Cells(rowNum, "E").value))
+    teacherName = Trim$(CStr(wsKinder.Cells(rowNum, "I").value))
     studentName = Trim$(lastName & " " & firstName)
 
-    birthDateValue = wsKinder.Cells(rowNum, "L").Value
-    dateFrom = wsKinder.Cells(rowNum, "G").Value
-    dateTo = wsKinder.Cells(rowNum, "H").Value
-    referenceDate = wsKinder.Range("T2").Value
+    birthDateValue = wsKinder.Cells(rowNum, "L").value
+    dateFrom = wsKinder.Cells(rowNum, "G").value
+    dateTo = wsKinder.Cells(rowNum, "H").value
+    referenceDate = wsKinder.Range("T2").value
 
     If Len(lastName) = 0 Then
         errorMsg = "Nachname (Spalte C) ist leer."
@@ -342,12 +342,12 @@ Private Function CreateLegacyBlank( _
     On Error GoTo ErrorHandler
     Set fso = CreateObject("Scripting.FileSystemObject")
 
-    If Not fso.FileExists(templatePath) Then
+    If Not fso.fileExists(templatePath) Then
         errorMsg = "SA-Template nicht gefunden: " & templatePath
         Exit Function
     End If
 
-    If fso.FileExists(outputPath) And Not overwriteExisting Then
+    If fso.fileExists(outputPath) And Not overwriteExisting Then
         errorMsg = "SA-Datei existiert bereits und wurde uebersprungen: " & _
                    outputPath
         Exit Function
@@ -362,7 +362,7 @@ Private Function CreateLegacyBlank( _
 
     operationStage = "lokale SA-Arbeitsdatei in Excel oeffnen"
     Set wbOutput = Workbooks.Open( _
-        FileName:=fso.GetFile(localExcelPath).ShortPath, _
+        fileName:=fso.GetFile(localExcelPath).ShortPath, _
         UpdateLinks:=0, _
         ReadOnly:=False, _
         AddToMru:=False)
@@ -376,13 +376,13 @@ Private Function CreateLegacyBlank( _
         GoTo CleanFail
     End If
 
-    wsTemplate.Range("B1").Value = lastName & " " & firstName
-    wsTemplate.Range("E1").Value = discipline
-    wsTemplate.Range("B2").Value = _
+    wsTemplate.Range("B1").value = lastName & " " & firstName
+    wsTemplate.Range("E1").value = discipline
+    wsTemplate.Range("B2").value = _
         NHblank_Utils.FormatDateRange(dateFrom, dateTo)
-    wsTemplate.Range("C4").Value = _
+    wsTemplate.Range("C4").value = _
         NHblank_Utils.GetGermanMonth(Month(referenceDate))
-    wsTemplate.Range("E4").Value = Year(referenceDate)
+    wsTemplate.Range("E4").value = Year(referenceDate)
 
     wbOutput.Save
     wbOutput.Close SaveChanges:=False
@@ -393,7 +393,7 @@ Private Function CreateLegacyBlank( _
     fso.CopyFile localExcelPath, stagingPath, True
 
     operationStage = "SA-Zieldatei ersetzen"
-    If fso.FileExists(outputPath) Then fso.DeleteFile outputPath, True
+    If fso.fileExists(outputPath) Then fso.DeleteFile outputPath, True
     fso.MoveFile stagingPath, outputPath
     fso.DeleteFile localExcelPath, True
 
@@ -406,10 +406,10 @@ CleanFail:
     Set wbOutput = Nothing
     If Not fso Is Nothing Then
         If Len(stagingPath) > 0 Then
-            If fso.FileExists(stagingPath) Then fso.DeleteFile stagingPath, True
+            If fso.fileExists(stagingPath) Then fso.DeleteFile stagingPath, True
         End If
         If Len(localExcelPath) > 0 Then
-            If fso.FileExists(localExcelPath) Then _
+            If fso.fileExists(localExcelPath) Then _
                 fso.DeleteFile localExcelPath, True
         End If
     End If
@@ -441,7 +441,7 @@ Private Function CreateTemporaryLegacyPath( _
         candidate = folderPath & "\~nhblank_" & _
                     Format$(Now, "yyyymmdd_hhnnss") & "_" & _
                     Format$(counter, "000") & ".xlsx"
-        If Not fso.FileExists(candidate) Then
+        If Not fso.fileExists(candidate) Then
             CreateTemporaryLegacyPath = candidate
             Exit Function
         End If
@@ -463,7 +463,7 @@ Private Function CreateLocalLegacyWorkingPath(ByVal fso As Object) As String
             tempFolder, _
             "nhblank_excel_" & Format$(Now, "yyyymmdd_hhnnss") & "_" & _
             Format$(counter, "000") & ".xlsx")
-        If Not fso.FileExists(candidate) Then
+        If Not fso.fileExists(candidate) Then
             CreateLocalLegacyWorkingPath = candidate
             Exit Function
         End If

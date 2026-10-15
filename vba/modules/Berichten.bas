@@ -388,9 +388,9 @@ NextRow:
         ' -------------------------------------------------------
         
         ' Format the date cells as desired (e.g., dd.mm.yyyy)
-        wsNew.Range("E3").NumberFormat = "dd.mm.yyyy"
-        wsNew.Range("C7").NumberFormat = "dd.mm.yyyy"
-        wsNew.Range("C8").NumberFormat = "dd.mm.yyyy"
+        wsNew.Range("E3").numberFormat = "dd.mm.yyyy"
+        wsNew.Range("C7").numberFormat = "dd.mm.yyyy"
+        wsNew.Range("C8").numberFormat = "dd.mm.yyyy"
         
         ' Initialize lineNumber for table entries
         ' Assuming that after A1:F12, the tables start from row 10
@@ -537,7 +537,7 @@ NextRow:
                         wsNew.Range("F" & lineNumber).value = "N/A"
                     End If
 
-                    wsNew.Range("B" & lineNumber).NumberFormat = "dd.mm.yyyy"
+                    wsNew.Range("B" & lineNumber).numberFormat = "dd.mm.yyyy"
 
                     totalCostAllDisciplines = totalCostAllDisciplines + calculatedValueF
                     totalCostFromRecord = totalCostFromRecord + calculatedValueF
@@ -553,9 +553,9 @@ NextRow:
             wsNew.Range("B" & lineNumber).PasteSpecial Paste:=xlPasteAll
 
             wsNew.Range("F" & lineNumber).value = totalCostFromRecord
-            wsNew.Range("F" & lineNumber).NumberFormat = "0.00"
+            wsNew.Range("F" & lineNumber).numberFormat = "0.00"
             wsNew.Range("D" & lineNumber).value = totalHoursFromRecord
-            wsNew.Range("D" & lineNumber).NumberFormat = "0.00"
+            wsNew.Range("D" & lineNumber).numberFormat = "0.00"
 
             lineNumber = lineNumber + 1
             lineNumber = lineNumber + 1 ' Empty row for visual separation
@@ -571,7 +571,7 @@ NextRow:
         
         ' Populate the total cost in FlineNumber with the sum of AQ cells, rounded to two decimals
         wsNew.Range("F" & lineNumber).value = WorksheetFunction.Round(totalCostAllDisciplines, 2)
-        wsNew.Range("F" & lineNumber).NumberFormat = "0.00"
+        wsNew.Range("F" & lineNumber).numberFormat = "0.00"
         
         ' Increment lineNumber after footer
         lineNumber = lineNumber + 1
@@ -689,7 +689,7 @@ Sub UpdateProgressBar(percent As Integer)
 End Sub
 
 ' Subroutine to log skipped rows due to missing data
-Sub LogSkippedRow(RowNumber As Long)
+Sub LogSkippedRow(rowNumber As Long)
     Dim wsErrorLog As Worksheet
     On Error Resume Next
     Set wsErrorLog = ThisWorkbook.Sheets("ErrorLog")
@@ -700,7 +700,7 @@ Sub LogSkippedRow(RowNumber As Long)
         wsErrorLog.Range("A1").value = "Skipped Rows Due to Missing Data"
         wsErrorLog.Range("A2").value = "Row Number"
     End If
-    wsErrorLog.Range("A" & wsErrorLog.rows.Count).End(xlUp).Offset(1, 0).value = RowNumber
+    wsErrorLog.Range("A" & wsErrorLog.rows.Count).End(xlUp).Offset(1, 0).value = rowNumber
 End Sub
 
 

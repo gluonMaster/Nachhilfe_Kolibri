@@ -30,18 +30,30 @@ There are no screenshots: the real workbooks contain personal data of children a
 | [vba/classes/](vba/classes/) | 4 class modules |
 | [vba/forms/](vba/forms/) | `frmProgress.frm` and its `.frx` resource |
 | [vba/worksheets/](vba/worksheets/) | Event code for the `Kinder` and `Kinder_Blanks` sheets |
-| [docs/INTEGRATION.md](docs/INTEGRATION.md) | How to import the code, workbook and template contracts, entry points and checks |
+| [vba/workbook/](vba/workbook/) | `ThisWorkbook` code: the `IsMacroRunning` flag used by archiving and synchronization |
+| [tools/](tools/) | `Export-WorkbookVba.ps1`, which refreshes `vba/` from the workbook |
+| [docs/INTEGRATION.md](docs/INTEGRATION.md) | How to import and export the code, workbook and template contracts, entry points and checks |
 | [docs/SOURCE_STATUS.md](docs/SOURCE_STATUS.md) | Where the sources come from and what has been verified |
 
 ## Requirements
 
 Desktop Excel on Windows with macros enabled, and desktop Word for the DOCX forms. COM objects (`Scripting.Dictionary`, `Scripting.FileSystemObject`, `VBScript.RegExp`, `ADODB.Stream`, `WScript.Shell`) are late-bound, so no references need to be set.
 
-The code expects the centre's workbook layout and local Word and Excel templates, which are not included. Read the [integration guide](docs/INTEGRATION.md) before importing anything: the files are UTF-8 and need encoding-aware import, and the worksheet code has to go into the matching sheet modules. Try changes in a copy of the workbook with invented records.
+The code expects the centre's workbook layout and local Word and Excel templates, which are not included. Read the [integration guide](docs/INTEGRATION.md) before importing anything: the files are UTF-8 and need encoding-aware import, and the worksheet and workbook code has to go into the matching document modules. Try changes in a copy of the workbook with invented records.
+
+## Updating the sources
+
+The code is edited and run in the workbook. After changing its VBA, export the project and commit the result:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\Export-WorkbookVba.ps1 -WorkbookPath <workbook.xlsm>
+```
+
+The script reads a temporary copy with macros disabled, rewrites `vba/` and needs Excel's **Trust access to the VBA project object model** setting. See [Exporting from the workbook](docs/INTEGRATION.md#exporting-from-the-workbook).
 
 ## Status
 
-The sources were compared module by module with the workbook in use. One change is ahead of it: Sozialamt records now get only the Excel form, and Word is started only when a DOCX form is needed. That change is documented but hasn't been run in the updated workbook yet. Self-checks for reference-number normalization and synthetic form generation are included. [docs/SOURCE_STATUS.md](docs/SOURCE_STATUS.md) lists the details and the remaining limits.
+`vba/` is an export of the workbook in use for the 2026/27 school year, so the sources match its VBA project component by component. This includes the output routing in which Sozialamt records get only the Excel form and Word is started only when a DOCX form is needed. Self-checks for reference-number normalization and synthetic form generation are included; there are no automated tests of the full workflows. [docs/SOURCE_STATUS.md](docs/SOURCE_STATUS.md) lists the details and the remaining limits.
 
 ## How it's built
 

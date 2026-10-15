@@ -398,7 +398,7 @@ Private Function PathAfterMarker( _
 
     markerPosition = InStr(1, urlPath, marker, vbTextCompare)
     If markerPosition > 0 Then
-        PathAfterMarker = Mid$( _
+        PathAfterMarker = mid$( _
             urlPath, markerPosition + Len(marker))
     End If
 End Function
@@ -412,7 +412,7 @@ Private Function GetUrlPath(ByVal url As String) As String
 
     pathPosition = InStr(schemePosition + 3, url, "/")
     If pathPosition > 0 Then
-        GetUrlPath = Mid$(url, pathPosition)
+        GetUrlPath = mid$(url, pathPosition)
     End If
 End Function
 
@@ -437,7 +437,7 @@ End Function
 
 Private Function TrimSlashes(ByVal value As String) As String
     Do While Left$(value, 1) = "/" Or Left$(value, 1) = "\"
-        value = Mid$(value, 2)
+        value = mid$(value, 2)
     Loop
 
     Do While Right$(value, 1) = "/" Or Right$(value, 1) = "\"
@@ -496,16 +496,16 @@ Private Function IsExpectedWorkbookFolder( _
     On Error GoTo 0
 
     If Len(workbookName) > 0 Then
-        If fso.FileExists(fso.BuildPath(folderPath, workbookName)) Then
+        If fso.fileExists(fso.BuildPath(folderPath, workbookName)) Then
             IsExpectedWorkbookFolder = True
             Exit Function
         End If
     End If
 
     IsExpectedWorkbookFolder = _
-        fso.FileExists(fso.BuildPath( _
+        fso.fileExists(fso.BuildPath( _
             folderPath, PRIMARY_TEMPLATE_NAME)) Or _
-        fso.FileExists(fso.BuildPath( _
+        fso.fileExists(fso.BuildPath( _
             folderPath, LEGACY_TEMPLATE_NAME))
 End Function
 
@@ -536,12 +536,12 @@ Private Function UrlDecodeUtf8(ByVal encodedText As String) As String
     i = 1
 
     Do While i <= Len(encodedText)
-        currentChar = Mid$(encodedText, i, 1)
+        currentChar = mid$(encodedText, i, 1)
 
         If currentChar = "%" And i + 2 <= Len(encodedText) And _
-           IsHexPair(Mid$(encodedText, i + 1, 2)) Then
+           IsHexPair(mid$(encodedText, i + 1, 2)) Then
             bytes(byteCount) = CByte( _
-                CLng("&H" & Mid$(encodedText, i + 1, 2)))
+                CLng("&H" & mid$(encodedText, i + 1, 2)))
             byteCount = byteCount + 1
             i = i + 3
         Else

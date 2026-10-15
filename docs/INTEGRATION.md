@@ -30,19 +30,23 @@ and resolve the encoding issue instead of silently replacing it with `?`.
 | `vba/forms/frmProgress.frm` + `.frx` | One UserForm; keep both files together |
 | `vba/worksheets/Kinder.vba` | Code pane of the worksheet named `Kinder` |
 | `vba/worksheets/Kinder_Blanks.vba` | Code pane of the worksheet named `Kinder_Blanks` |
+| `vba/workbook/ThisWorkbook.vba` | Code pane of the workbook object (`ThisWorkbook`, shown as `DieseArbeitsmappe` in German Excel) |
 
-The worksheet `.vba` files contain code bodies without export headers. Do not
-import them as standard modules: their `Worksheet_Change` handlers belong to the
-actual worksheet components. If handlers already exist, compare and reconcile
-them rather than appending duplicate procedures.
+The worksheet and workbook `.vba` files contain code bodies without export
+headers. Do not import them as standard modules: their `Worksheet_Change`
+handlers belong to the actual worksheet components. If handlers already exist,
+compare and reconcile them rather than appending duplicate procedures.
+
+`ThisWorkbook.vba` declares the public `IsMacroRunning` flag. `Archivierung` and
+`Synchronisation` set it through `ThisWorkbook.IsMacroRunning`, so the project
+does not compile until this declaration is in place.
 
 For `frmProgress`, the `.frm` designer information and matching `.frx` are needed
 to reconstruct the controls. Do not strip its designer header or treat its text
 as a substitute for the entire form. If converting the textual `.frm` before
 import, preserve the component/resource names and leave the `.frx` binary intact.
 Where a compatible form already exists in the test workbook, compare its code
-and controls before replacing it. The retained form's binary design has not been
-verified against the current reference workbook.
+and controls before replacing it.
 
 The optional `ModuleManager` and `VBA_Export_All` utilities access the VBA project
 programmatically and require Excel's **Trust access to the VBA project object
@@ -148,9 +152,41 @@ The generation self-check can overwrite its fixed test filenames. Use a fresh
 disposable output folder. It exercises the two output helpers directly; it does
 not prove that the record-processing route correctly selects XLSX-only output.
 
-For the source change that is ahead of the reference workbook, check one
-synthetic Jobcenter record and one synthetic Sozialamt record through the actual
+To check the output routing in an integrated test workbook, run one synthetic
+Jobcenter record and one synthetic Sozialamt record through the actual
 generation entry point. Check the resulting output types, then inspect one
 representative record edit and report generation to confirm worksheet events and
 the progress form are connected correctly. These are suggested integration
 checks, not previously completed test results.
+
+## Exporting from the workbook
+
+The workbook is the working copy of the code: changes are made and run there,
+then exported into `vba/` and committed. `tools/Export-WorkbookVba.ps1` does the
+export:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\Export-WorkbookVba.ps1 -WorkbookPath <workbook.xlsm>
+```
+
+Without `-WorkbookPath` the script uses the only `Nachhilfe_*.xlsm` in the
+repository root; Office files there are ignored by git. The script:
+
+- copies the workbook to a temporary folder and opens the copy read-only in a
+  hidden Excel instance with macros and events disabled;
+- replaces the `.bas`, `.cls`, `.frm`/`.frx` and `.vba` files in `vba/`, so
+  components removed from the workbook disappear from the repository as well;
+- writes worksheet code as `vba/worksheets/<sheet name>.vba` and workbook code as
+  `vba/workbook/ThisWorkbook.vba` without export headers, and skips document
+  modules without code;
+- keeps the code text as exported, writes UTF-8 with LF line endings (CRLF for
+  `.frm`) and decodes bytes that are not valid UTF-8 with the Windows ANSI code
+  page;
+- stops Excel and fails without touching `vba/` if Excel shows a dialog or does
+  not finish within `-TimeoutSec` (120 seconds by default).
+
+It requires desktop Excel and the **Trust access to the VBA project object
+model** setting. Review `git diff` before committing. The VBA editor keeps one
+spelling per identifier across the whole project, so an unrelated declaration
+can change the case of names elsewhere (for example `NumberFormat` to
+`numberFormat`). Such differences do not change behavior.

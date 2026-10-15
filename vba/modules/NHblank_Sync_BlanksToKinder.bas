@@ -254,8 +254,8 @@ Private Sub UpdateGHColumns(ByVal wsSource As Worksheet, _
     wsTarget.Cells(targetRow, "H").value = hValue
     
     ' Ensure date format
-    wsTarget.Cells(targetRow, "G").NumberFormat = "dd.mm.yyyy"
-    wsTarget.Cells(targetRow, "H").NumberFormat = "dd.mm.yyyy"
+    wsTarget.Cells(targetRow, "G").numberFormat = "dd.mm.yyyy"
+    wsTarget.Cells(targetRow, "H").numberFormat = "dd.mm.yyyy"
 End Sub
 
 ' -----------------------------------------------------------------------------
@@ -288,8 +288,8 @@ Private Sub AddRecordToKinder(ByVal wsSource As Worksheet, _
     Next col
     
     ' Ensure date format for G and H
-    wsKinder.Cells(newRow, "G").NumberFormat = "dd.mm.yyyy"
-    wsKinder.Cells(newRow, "H").NumberFormat = "dd.mm.yyyy"
+    wsKinder.Cells(newRow, "G").numberFormat = "dd.mm.yyyy"
+    wsKinder.Cells(newRow, "H").numberFormat = "dd.mm.yyyy"
 End Sub
 
 ' -----------------------------------------------------------------------------

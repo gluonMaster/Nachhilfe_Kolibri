@@ -42,8 +42,8 @@ Public Function NHblank_NormalizeAndProtectBgCell( _
     On Error GoTo WriteError
 
     currentValue = Trim$(CStr(sourceCell.Value2))
-    If currentValue <> normalizedNumber Or sourceCell.NumberFormat <> "@" Then
-        sourceCell.NumberFormat = "@"
+    If currentValue <> normalizedNumber Or sourceCell.numberFormat <> "@" Then
+        sourceCell.numberFormat = "@"
         sourceCell.Value2 = normalizedNumber
     End If
 
@@ -81,8 +81,8 @@ Public Function NHblank_TryNormalizeBgCell( _
     On Error GoTo ReadError
 
     rawValue = sourceCell.Value2
-    cellValue = sourceCell.Value
-    formatInvariant = CStr(sourceCell.NumberFormat)
+    cellValue = sourceCell.value
+    formatInvariant = CStr(sourceCell.numberFormat)
     formatLocal = CStr(sourceCell.NumberFormatLocal)
 
     If IsError(rawValue) Or IsNull(rawValue) Or IsEmpty(rawValue) Then
@@ -138,7 +138,7 @@ Private Function NormalizeTextValue( _
     cleaned = Replace(cleaned, vbLf, "")
 
     If Left$(cleaned, 1) = "'" Then
-        cleaned = Mid$(cleaned, 2)
+        cleaned = mid$(cleaned, 2)
     End If
 
     If Len(cleaned) = 0 Then
@@ -159,7 +159,7 @@ Private Function NormalizeTextValue( _
     If RegexMatches(cleaned, "^\d{4,5}/{1,2}\d{7}$") Then
         slashPosition = InStr(1, cleaned, "/", vbBinaryCompare)
         normalizedNumber = Left$(cleaned, slashPosition - 1) & "//" & _
-                           Mid$(cleaned, InStrRev(cleaned, "/") + 1)
+                           mid$(cleaned, InStrRev(cleaned, "/") + 1)
         isJobcenter = True
         NormalizeTextValue = True
         Exit Function
@@ -250,9 +250,9 @@ Private Function RegexMatches(ByVal textValue As String, _
     Dim regex As Object
 
     Set regex = CreateObject("VBScript.RegExp")
-    regex.Pattern = pattern
+    regex.pattern = pattern
     regex.Global = False
-    regex.IgnoreCase = True
+    regex.ignoreCase = True
 
     RegexMatches = regex.Test(textValue)
 End Function

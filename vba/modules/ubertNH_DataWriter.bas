@@ -65,8 +65,8 @@ Public Sub HighlightNotFoundRow(ByVal srcSheet As Worksheet, _
     
     ' Highlight cells A:C in the source row
     Set HighlightRange = srcSheet.Range( _
-        ubertNH_Config.SRC_COL_ID & srcRecord.RowNumber & ":" & _
-        ubertNH_Config.SRC_COL_FIRSTNAME & srcRecord.RowNumber)
+        ubertNH_Config.SRC_COL_ID & srcRecord.rowNumber & ":" & _
+        ubertNH_Config.SRC_COL_FIRSTNAME & srcRecord.rowNumber)
     
     ubertNH_Utils.HighlightRange HighlightRange
 End Sub
@@ -100,7 +100,7 @@ Public Function ProcessTransfer(ByVal srcSheet As Worksheet, _
         Else
             ' Log not found
             ubertNH_Logger.LogRecordNotFound _
-                record.RowNumber, _
+                record.rowNumber, _
                 record.ID, _
                 record.lastName & " " & record.firstName, _
                 record.subject, _

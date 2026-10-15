@@ -87,14 +87,14 @@ Sub ArchiveAndCleanKinder_Optimized_Fixed()
     Next cell
     
     ' Ensure column O is formatted as text to prevent conversion to exponential/date format
-    wsKinder.Range("O5:O" & lastRowKinder).NumberFormat = "@"
+    wsKinder.Range("O5:O" & lastRowKinder).numberFormat = "@"
     
     ' Determine the last filled row on the Archiv sheet
     lastRowArchiv = wsArchiv.Cells(wsArchiv.rows.Count, "A").End(xlUp).row
     
     ' Ensure column O in Archiv is formatted as text to prevent conversion issues
     If lastRowArchiv >= 5 Then
-        wsArchiv.Range("O5:O" & lastRowArchiv).NumberFormat = "@"
+        wsArchiv.Range("O5:O" & lastRowArchiv).numberFormat = "@"
     End If
     
     ' Initialize Dictionary to store keys from Archiv
@@ -276,7 +276,7 @@ Sub ArchiveAndCleanKinder_Optimized_Fixed()
             .Columns("T").HorizontalAlignment = xlCenter
             
             ' Format column O as text to prevent conversion to exponential/date format
-            .Columns("O").NumberFormat = "@"
+            .Columns("O").numberFormat = "@"
         End With
     End If
     
@@ -311,7 +311,7 @@ Sub ArchiveAndCleanKinder_Optimized_Fixed()
         wsKinder.Range("A5").Resize(totalRecords, 22).value = combinedRecords
         
         ' Format column O as text to prevent conversion to exponential/date format
-        wsKinder.Range("O5:O" & 4 + totalRecords).NumberFormat = "@"
+        wsKinder.Range("O5:O" & 4 + totalRecords).numberFormat = "@"
         
         ' Add the formula back to column M for all records
         wsKinder.Range("M5:M" & 4 + totalRecords).FormulaR1C1 = "=DATEDIF(RC[-1], TODAY(), ""Y"")"
@@ -368,7 +368,7 @@ Sub ArchiveAndCleanKinder_Optimized_Fixed()
         lastRowArchiv = wsArchiv.Cells(wsArchiv.rows.Count, "A").End(xlUp).row
         
         ' Ensure column O is formatted as text for all records in Archiv
-        wsArchiv.Range("O5:O" & lastRowArchiv).NumberFormat = "@"
+        wsArchiv.Range("O5:O" & lastRowArchiv).numberFormat = "@"
         
         With wsArchiv.Sort
             .SortFields.Clear
@@ -552,7 +552,7 @@ Sub RemoveDuplicatesFromArchiv()
             wsArchiv.Range("A5").Resize(totalRows, 1).value = serials
             
             ' Ensure column O is formatted as text to prevent conversion issues
-            wsArchiv.Range("O5:O" & lastRowArchiv).NumberFormat = "@"
+            wsArchiv.Range("O5:O" & lastRowArchiv).numberFormat = "@"
         End If
         
         ' Inform the user

@@ -117,12 +117,12 @@ Public Function NHblank_CreateFilledWordBlank( _
         Exit Function
     End If
 
-    If Not fso.FileExists(templatePath) Then
+    If Not fso.fileExists(templatePath) Then
         errorMsg = "Word-Template nicht gefunden: " & templatePath
         Exit Function
     End If
 
-    If fso.FileExists(outputPath) And Not overwriteExisting Then
+    If fso.fileExists(outputPath) And Not overwriteExisting Then
         errorMsg = "Datei existiert bereits und wurde uebersprungen: " & _
                    outputPath
         Exit Function
@@ -183,7 +183,7 @@ Public Function NHblank_CreateFilledWordBlank( _
     fso.CopyFile localWordPath, stagingPath, True
 
     operationStage = "Zieldatei ersetzen"
-    If fso.FileExists(outputPath) Then fso.DeleteFile outputPath, True
+    If fso.fileExists(outputPath) Then fso.DeleteFile outputPath, True
     fso.MoveFile stagingPath, outputPath
     fso.DeleteFile localWordPath, True
 
@@ -196,10 +196,10 @@ CleanFail:
     Set doc = Nothing
     If Not fso Is Nothing Then
         If Len(stagingPath) > 0 Then
-            If fso.FileExists(stagingPath) Then fso.DeleteFile stagingPath, True
+            If fso.fileExists(stagingPath) Then fso.DeleteFile stagingPath, True
         End If
         If Len(localWordPath) > 0 Then
-            If fso.FileExists(localWordPath) Then _
+            If fso.fileExists(localWordPath) Then _
                 fso.DeleteFile localWordPath, True
         End If
     End If
@@ -415,7 +415,7 @@ Private Function CreateTemporarySiblingPath( _
         candidate = folderPath & "\~nhblank_" & _
                     Format$(Now, "yyyymmdd_hhnnss") & "_" & _
                     Format$(counter, "000") & extensionWithDot
-        If Not fso.FileExists(candidate) Then
+        If Not fso.fileExists(candidate) Then
             CreateTemporarySiblingPath = candidate
             Exit Function
         End If
@@ -441,7 +441,7 @@ Private Function CreateLocalWordWorkingPath( _
             tempFolder, _
             "nhblank_word_" & Format$(Now, "yyyymmdd_hhnnss") & "_" & _
             Format$(counter, "000") & extensionWithDot)
-        If Not fso.FileExists(candidate) Then
+        If Not fso.fileExists(candidate) Then
             CreateLocalWordWorkingPath = candidate
             Exit Function
         End If

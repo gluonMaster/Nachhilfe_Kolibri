@@ -2,13 +2,13 @@ Option Explicit
 
 Private Sub Worksheet_Change(ByVal Target As Range)
     On Error GoTo ExitHandler
-
+    
     ' Prevent the event from triggering recursively
     Application.EnableEvents = False
-
+    
     Dim ws As Worksheet
     Set ws = Me ' Current sheet (e.g., "Kinder")
-
+    
     Dim wsArchiv As Worksheet
     Set wsArchiv = ThisWorkbook.Sheets("Archiv")
 
@@ -57,7 +57,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
 
                 ' Copy data from Archiv if needed
                 Call CopyDataFromArchiv(ws, wsArchiv, currentRow)
-
+            
             Else
                 ' If both C and D are empty, clear the entire row
                 If currentRow >= START_ROW Then
@@ -75,21 +75,21 @@ NextCell:
             If Not IsEmpty(changedCell.value) Then
                 Dim originalValue As String
                 originalValue = Trim(changedCell.value)
-
+                
                 ' Set cell format to text to avoid automatic date conversion
                 changedCell.numberFormat = "@"
-
+                
                 ' Replace commas with dots
                 originalValue = Replace(originalValue, ",", ".")
-
+                
                 ' Trim spaces
                 originalValue = Application.WorksheetFunction.Trim(originalValue)
-
+                
                 ' Check if format is valid
                 If Not IsValidFormat(originalValue) Then
                     Dim correctedValue As String
                     correctedValue = CorrectFormat(originalValue)
-
+                    
                     If correctedValue <> "" Then
                         ' If correction succeeded
                         changedCell.value = correctedValue
@@ -206,20 +206,20 @@ End Sub
 Private Function IsValidFormat(ByVal textVal As String) As Boolean
     Dim regex As Object
     Set regex = CreateObject("VBScript.RegExp")
-
+    
     With regex
         .pattern = "^\d\.\s\d{4}$"
         .ignoreCase = True
         .Global = False
     End With
-
+    
     IsValidFormat = regex.Test(textVal)
 End Function
 
 Private Function CorrectFormat(ByVal textVal As String) As String
     Dim parts() As String
     Dim firstPart As String, secondPart As String
-
+    
     ' Try splitting by dot
     parts = Split(textVal, ".")
     If UBound(parts) = 1 Then
@@ -232,7 +232,7 @@ Private Function CorrectFormat(ByVal textVal As String) As String
             End If
         End If
     End If
-
+    
     ' Try splitting by comma
     parts = Split(textVal, ",")
     If UBound(parts) = 1 Then
@@ -245,7 +245,8 @@ Private Function CorrectFormat(ByVal textVal As String) As String
             End If
         End If
     End If
-
+    
     ' If no correction possible
     CorrectFormat = ""
 End Function
+

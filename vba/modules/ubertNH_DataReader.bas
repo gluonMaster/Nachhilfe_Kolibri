@@ -35,7 +35,7 @@ Public Function ReadSourceRecords(ByVal srcSheet As Worksheet) As Collection
                 
                 ' Read record
                 With record
-                    .RowNumber = currentRow
+                    .rowNumber = currentRow
                     .ID = idValue
                     .lastName = Trim(CStr(srcSheet.Range(ubertNH_Config.SRC_COL_LASTNAME & currentRow).value))
                     .firstName = Trim(CStr(srcSheet.Range(ubertNH_Config.SRC_COL_FIRSTNAME & currentRow).value))

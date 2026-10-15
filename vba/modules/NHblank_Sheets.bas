@@ -191,7 +191,7 @@ Private Sub EnsureT2IsValue(ByVal wsBlanks As Worksheet, ByVal wsKinder As Works
     End If
     
     ' Ensure date format
-    cellT2.NumberFormat = "dd.mm.yyyy"
+    cellT2.numberFormat = "dd.mm.yyyy"
 End Sub
 
 ' -----------------------------------------------------------------------------
