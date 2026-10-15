@@ -4,14 +4,16 @@ Attribute VB_Name = "ModuleManager"
 '   Purpose: Import/Export VBA modules (.bas, .cls) with user-friendly dialogs
 '
 '   Features:
-'   - Import multiple .bas/.cls files at once
+'   - Import multiple .bas/.cls/.frm files at once (a form needs its .frx beside it)
 '   - Warning if modules with same names already exist
-'   - Handles files without proper Attribute headers
+'   - Handles files without proper Attribute headers or with LF line endings
+'   - Replaces a module only after the new one was imported
+'   - Refuses code of sheets and the workbook (paste it in the VBA editor)
 '   - Export all modules to selected folder
 '   - Export selected modules from a list
 '
 '   Entry Points:
-'   - ImportModules()        - Select and import multiple .bas/.cls files
+'   - ImportModules()        - Select and import multiple .bas/.cls/.frm files
 '   - ExportAllModules()     - Export all modules to selected folder
 '   - ExportSelectedModules() - Show list and export selected modules
 '
@@ -32,7 +34,7 @@ Private Const vbext_ct_Document As Long = 100
 ' IMPORT MODULES
 ' ============================================================
 
-' Main entry point: Import multiple .bas/.cls files
+' Main entry point: Import multiple .bas/.cls/.frm files
 Public Sub ImportModules()
     On Error GoTo ErrorHandler
     
@@ -54,9 +56,10 @@ Public Sub ImportModules()
         .title = "VBA-Module zum Importieren auswaehlen"
         .AllowMultiSelect = True
         .Filters.Clear
-        .Filters.Add "VBA-Module", "*.bas;*.cls"
+        .Filters.Add "VBA-Module", "*.bas;*.cls;*.frm"
         .Filters.Add "Standard-Module (*.bas)", "*.bas"
         .Filters.Add "Klassen-Module (*.cls)", "*.cls"
+        .Filters.Add "Formulare (*.frm, mit .frx daneben)", "*.frm"
         .Filters.Add "Alle Dateien", "*.*"
         .FilterIndex = 1
         
@@ -102,12 +105,14 @@ Public Sub ImportModules()
     
     Application.ScreenUpdating = False
     
+    Dim reason As String
     For i = LBound(filePaths) To UBound(filePaths)
-        If ImportSingleModule(filePaths(i)) Then
+        reason = ImportSingleModule(filePaths(i))
+        If reason = "" Then
             importedCount = importedCount + 1
         Else
             failedCount = failedCount + 1
-            failedFiles = failedFiles & vbCrLf & "  - " & GetFileName(filePaths(i))
+            failedFiles = failedFiles & vbCrLf & "  - " & GetFileName(filePaths(i)) & ": " & reason
         End If
     Next i
     
@@ -210,135 +215,159 @@ Private Function ModuleExists(ByVal moduleName As String) As Boolean
     On Error GoTo 0
 End Function
 
-' Import a single module file
-Private Function ImportSingleModule(ByVal filePath As String) As Boolean
-    On Error GoTo ErrorHandler
+' Import a single module file. Returns "" on success, otherwise the reason.
+Private Function ImportSingleModule(ByVal filePath As String) As String
+    Dim moduleName As String, tempPath As String, oldComp As Object
+    On Error GoTo Failed
     
-    Dim moduleName As String
     moduleName = GetModuleNameFromFile(filePath)
+    If StrComp(moduleName, "ModuleManager", vbTextCompare) = 0 Then
+        ImportSingleModule = "ModuleManager kann sich nicht selbst ersetzen; bitte im VBA-Editor manuell importieren"
+        Exit Function
+    End If
     
-    ' Remove existing module if present
+    ' Sheet and workbook modules cannot be removed: the old one would stay renamed next to
+    ' a class module that never runs.
     If ModuleExists(moduleName) Then
-        ThisWorkbook.VBProject.VBComponents.Remove _
-            ThisWorkbook.VBProject.VBComponents(moduleName)
-    End If
-    
-    ' Check if file has proper Attribute header
-    If Not HasAttributeHeader(filePath) Then
-        ' File doesn't have Attribute header - need to fix it
-        Dim tempPath As String
-        tempPath = CreateTempFileWithHeader(filePath, moduleName)
-        
-        If tempPath <> "" Then
-            ThisWorkbook.VBProject.VBComponents.Import tempPath
-            ' Delete temp file
-            On Error Resume Next
-            Kill tempPath
-            On Error GoTo ErrorHandler
-        Else
-            ImportSingleModule = False
+        If ThisWorkbook.VBProject.VBComponents(moduleName).Type = vbext_ct_Document Then
+            ImportSingleModule = "Code von Tabellen und Arbeitsmappe bitte im VBA-Editor einfuegen"
             Exit Function
         End If
-    Else
-        ' Normal import
-        ThisWorkbook.VBProject.VBComponents.Import filePath
     End If
     
-    ImportSingleModule = True
+    ' Import never reads the selected file directly: a class module is recognised only with
+    ' CRLF line endings, otherwise it arrives as a standard module with its header as code.
+    Dim reason As String
+    tempPath = CreateImportCopy(filePath, moduleName, reason)
+    If tempPath = "" Then
+        ImportSingleModule = reason
+        Exit Function
+    End If
+    
+    ' A removed module keeps its name until the macro ends, so the new one would get a
+    ' suffixed name. The old module steps aside and is removed only after a successful import.
+    If ModuleExists(moduleName) Then
+        Set oldComp = ThisWorkbook.VBProject.VBComponents(moduleName)
+        oldComp.name = FreeModuleName(moduleName)
+    End If
+    ThisWorkbook.VBProject.VBComponents.Import tempPath
+    If Not oldComp Is Nothing Then ThisWorkbook.VBProject.VBComponents.Remove oldComp
+    ImportSingleModule = ""
+    
+Done:
+    On Error Resume Next
+    If Len(tempPath) > 0 Then DeleteImportFolder tempPath
     Exit Function
     
-ErrorHandler:
+Failed:
+    ImportSingleModule = "Fehler " & Err.Number & ": " & Err.Description
     Debug.Print "Error importing " & filePath & ": " & Err.Description
-    ImportSingleModule = False
+    Resume KeepOld
+KeepOld:
+    ' Without a new module the old one keeps its name and code.
+    On Error Resume Next
+    If Not oldComp Is Nothing Then
+        If Not ModuleExists(moduleName) Then oldComp.name = moduleName
+    End If
+    GoTo Done
 End Function
 
-' Check if file has Attribute VB_Name header
-Private Function HasAttributeHeader(ByVal filePath As String) As Boolean
-    On Error GoTo NoHeader
-    
-    Dim fso As Object
-    Set fso = CreateObject("Scripting.FileSystemObject")
-    
-    Dim ts As Object
-    Set ts = fso.OpenTextFile(filePath, 1, False)
-    
-    Dim line As String
-    Dim lineCount As Long
-    lineCount = 0
-    
-    ' Check first 10 lines for Attribute VB_Name
-    Do While Not ts.AtEndOfStream And lineCount < 10
-        line = ts.ReadLine
-        lineCount = lineCount + 1
-        
-        If InStr(1, line, "Attribute VB_Name", vbTextCompare) > 0 Then
-            ts.Close
-            HasAttributeHeader = True
-            Exit Function
-        End If
-    Loop
-    
-    ts.Close
-    HasAttributeHeader = False
-    Exit Function
-    
-NoHeader:
-    HasAttributeHeader = False
+' A name for a module that is about to be replaced. A removed form keeps its name until the
+' workbook is saved, so the name is new for the whole session, not only for the project.
+Private Function FreeModuleName(ByVal baseName As String) As String
+    Static serial As Long
+    Do
+        serial = serial + 1
+        FreeModuleName = Left$(baseName, 18) & "_old" & Format$(Now, "hhnnss") & serial
+    Loop While ModuleExists(FreeModuleName)
 End Function
 
-' Create temp file with proper Attribute header
-Private Function CreateTempFileWithHeader(ByVal sourcePath As String, ByVal moduleName As String) As String
+' Temp copy for VBComponents.Import in a folder of its own: CRLF line endings, an Attribute
+' header, and for a form its binary .frx under the name the .frm refers to.
+' Returns the path of the copy, or "" with the reason.
+Private Function CreateImportCopy(ByVal sourcePath As String, ByVal moduleName As String, _
+                                  ByRef reason As String) As String
+    Dim fso As Object, ts As Object, ext As String, content As String, header As String
+    Dim folder As String, tempPath As String, frxName As String, frxSource As String
+    Dim pos As Long, quotePos As Long
     On Error GoTo ErrorHandler
-    
-    Dim fso As Object
     Set fso = CreateObject("Scripting.FileSystemObject")
     
-    ' Determine module type from extension
-    Dim ext As String
-    ext = LCase(fso.GetExtensionName(sourcePath))
+    ' A file of another type is imported as a standard module.
+    ext = LCase$(fso.GetExtensionName(sourcePath))
+    If ext <> "cls" And ext <> "frm" Then ext = "bas"
     
-    Dim isClass As Boolean
-    isClass = (ext = "cls")
-    
-    ' Read source file
-    Dim ts As Object
     Set ts = fso.OpenTextFile(sourcePath, 1, False)
-    Dim content As String
     content = ts.ReadAll
     ts.Close
+    ' Any mix of CR, LF and CRLF becomes CRLF.
+    content = Replace(Replace(content, vbCrLf, vbLf), vbCr, vbLf)
+    content = Replace(content, vbLf, vbCrLf)
     
-    ' Create temp file path
-    Dim tempPath As String
-    tempPath = Environ("TEMP") & "\" & moduleName & "." & ext
+    folder = fso.BuildPath(Environ("TEMP"), "VbaImport_" & fso.GetBaseName(fso.GetTempName()))
+    fso.CreateFolder folder
+    tempPath = fso.BuildPath(folder, moduleName & "." & ext)
     
-    ' Build header
-    Dim header As String
-    If isClass Then
-        header = "VERSION 1.0 CLASS" & vbCrLf & _
-                 "BEGIN" & vbCrLf & _
-                 "  MultiUse = -1  'True" & vbCrLf & _
-                 "END" & vbCrLf & _
-                 "Attribute VB_Name = """ & moduleName & """" & vbCrLf & _
-                 "Attribute VB_GlobalNameSpace = False" & vbCrLf & _
-                 "Attribute VB_Creatable = False" & vbCrLf & _
-                 "Attribute VB_PredeclaredId = False" & vbCrLf & _
-                 "Attribute VB_Exposed = False" & vbCrLf
+    If ext = "frm" Then
+        ' The designer of a form is the binary .frx, which Import looks up beside the .frm.
+        If InStr(1, Left$(content, 2000), "Attribute VB_Name", vbTextCompare) = 0 Then
+            reason = "Formulardatei ohne Kopfzeilen"
+            GoTo Refused
+        End If
+        pos = InStr(1, content, ".frx""", vbTextCompare)
+        If pos > 0 Then
+            quotePos = InStrRev(content, """", pos)
+            frxName = mid$(content, quotePos + 1, pos + 3 - quotePos)
+            frxSource = fso.BuildPath(fso.GetParentFolderName(sourcePath), frxName)
+            If Not fso.fileExists(frxSource) Then _
+                frxSource = fso.BuildPath(fso.GetParentFolderName(sourcePath), fso.GetBaseName(sourcePath) & ".frx")
+            If Not fso.fileExists(frxSource) Then
+                reason = "Die zugehoerige Datei " & frxName & " fehlt neben der .frm-Datei"
+                GoTo Refused
+            End If
+            fso.CopyFile frxSource, fso.BuildPath(folder, frxName)
+        End If
     Else
-        header = "Attribute VB_Name = """ & moduleName & """" & vbCrLf
+        If InStr(1, Left$(content, 2000), "Attribute VB_Name", vbTextCompare) = 0 Then
+            If ext = "cls" Then
+                header = "VERSION 1.0 CLASS" & vbCrLf & _
+                         "BEGIN" & vbCrLf & _
+                         "  MultiUse = -1  'True" & vbCrLf & _
+                         "END" & vbCrLf & _
+                         "Attribute VB_Name = """ & moduleName & """" & vbCrLf & _
+                         "Attribute VB_GlobalNameSpace = False" & vbCrLf & _
+                         "Attribute VB_Creatable = False" & vbCrLf & _
+                         "Attribute VB_PredeclaredId = False" & vbCrLf & _
+                         "Attribute VB_Exposed = False" & vbCrLf
+            Else
+                header = "Attribute VB_Name = """ & moduleName & """" & vbCrLf
+            End If
+        End If
     End If
     
-    ' Write temp file with header
     Set ts = fso.CreateTextFile(tempPath, True)
     ts.Write header & content
     ts.Close
-    
-    CreateTempFileWithHeader = tempPath
+    CreateImportCopy = tempPath
     Exit Function
     
 ErrorHandler:
-    Debug.Print "Error creating temp file: " & Err.Description
-    CreateTempFileWithHeader = ""
+    reason = "Datei konnte nicht vorbereitet werden (" & Err.Description & ")"
+    Debug.Print "Error creating import copy: " & Err.Description
+    Resume Refused
+Refused:
+    If Len(folder) > 0 Then DeleteImportFolder fso.BuildPath(folder, "x")
+    CreateImportCopy = ""
 End Function
+
+' Removes the temp folder that holds an import copy
+Private Sub DeleteImportFolder(ByVal tempPath As String)
+    Dim fso As Object, folder As String
+    On Error Resume Next
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    folder = fso.GetParentFolderName(tempPath)
+    If InStr(1, fso.GetFileName(folder), "VbaImport_", vbTextCompare) = 1 Then fso.DeleteFolder folder, True
+End Sub
 
 ' ============================================================
 ' EXPORT ALL MODULES

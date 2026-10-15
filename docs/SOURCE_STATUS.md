@@ -29,6 +29,9 @@ a backup of the operational workbook system.
   the previous snapshot alone did not compile.
 - `frmProgress` now comes from the workbook. Its code and controls match the
   earlier copy.
+- `ModuleManager` is the newer version shared with the administrative workbook
+  project, with a guard against importing worksheet or workbook code. The
+  workbook was updated with it, so the export contains it as well.
 - The remaining differences are spelling only. In 16 modules and one class the VBA
   editor changed the case of identifiers (for example `NumberFormat` to
   `numberFormat`), and the worksheet files keep the indentation of blank lines.

@@ -51,8 +51,18 @@ and controls before replacing it.
 The optional `ModuleManager` and `VBA_Export_All` utilities access the VBA project
 programmatically and require Excel's **Trust access to the VBA project object
 model** setting. This is separate from enabling macros. Manual installation
-through the VBA editor does not require these utilities. `ModuleManager` is not
-an encoding converter; prepare correctly encoded import copies first.
+through the VBA editor does not require these utilities.
+
+`ModuleManager.ImportModules` accepts the repository's `.bas`, `.cls` and `.frm`
+files as they are. It imports from a temporary copy with CRLF line endings, so
+class modules with LF endings arrive as classes, and it takes a form's `.frx`
+from beside the `.frm`. An existing component is replaced only after the new one
+has been imported. It refuses to replace itself and refuses worksheet and
+workbook code; paste the `.vba` files in the VBA editor instead, and update
+`ModuleManager` itself through **File > Import File**. It reads files in the
+Windows ANSI code page and is not an encoding converter: text outside ASCII
+needs a correctly encoded import copy. Its export entry points write standard
+and class modules only; `tools/Export-WorkbookVba.ps1` exports the whole project.
 
 ## Workbook contracts
 
